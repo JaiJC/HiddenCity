@@ -43,22 +43,6 @@ export default function MapView({
     [center],
   );
 
-  const mapOptions: google.maps.MapOptions = useMemo(
-    () => ({
-      styles: [],
-      disableDefaultUI: true,
-      zoomControl: true,
-      zoomControlOptions: {
-        position: google.maps?.ControlPosition?.RIGHT_BOTTOM,
-      },
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: false,
-      backgroundColor: '#f8f9fa',
-    }),
-    [],
-  );
-
   const onLoad = useCallback((m: google.maps.Map) => {
     setMap(m);
   }, []);
@@ -88,7 +72,18 @@ export default function MapView({
         center={mapCenter}
         zoom={13}
         onLoad={onLoad}
-        options={mapOptions}
+        options={{
+          styles: [],
+          disableDefaultUI: true,
+          zoomControl: true,
+          zoomControlOptions: {
+            position: google.maps.ControlPosition.RIGHT_BOTTOM,
+          },
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          backgroundColor: '#f8f9fa',
+        }}
       >
         {/* Search radius circle */}
         <CircleF

@@ -177,7 +177,7 @@ export default function LandingPage() {
               Browse by Category
             </h2>
             <p className="mt-2 text-gray-400">
-              Tap to explore what's hidden near you
+              Tap to explore what&apos;s hidden near you
             </p>
           </div>
 
