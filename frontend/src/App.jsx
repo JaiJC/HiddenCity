@@ -2,6 +2,7 @@ import { Link, Route, Routes } from "react-router-dom";
 import SearchPage from "./pages/SearchPage";
 import ResultsPage from "./pages/ResultsPage";
 import HowItWorksPage from "./pages/HowItWorksPage";
+import DemoPage from "./pages/DemoPage";
 
 export default function App() {
   return (
@@ -21,6 +22,9 @@ export default function App() {
             <Link className="hover:text-streettrade-accent" to="/how-it-works">
               How it works
             </Link>
+            <Link className="hover:text-streettrade-accent" to="/demo">
+              Demo
+            </Link>
           </nav>
         </div>
       </header>
@@ -29,6 +33,7 @@ export default function App() {
           <Route path="/" element={<SearchPage />} />
           <Route path="/results" element={<ResultsPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/demo" element={<DemoPage />} />
         </Routes>
       </main>
     </div>

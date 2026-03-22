@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import BusinessMap from "../components/BusinessMap";
@@ -23,11 +23,16 @@ function haversineKm(lat1, lng1, lat2, lng2) {
 export default function ResultsPage() {
   const [params] = useSearchParams();
   const queryClient = useQueryClient();
+  const resultsSectionRef = useRef(null);
+  const cardRefs = useRef({});
+  const [selectedBusinessId, setSelectedBusinessId] = useState("");
+  const [onlyExclusive, setOnlyExclusive] = useState(params.get("exclusive") === "1");
 
   const query = params.get("query") || "";
   const lat = Number(params.get("lat") || 49.2635);
   const lng = Number(params.get("lng") || -123.0735);
   const radiusKm = Number(params.get("radius_km") || 1.5);
+  const categoryLabel = params.get("category_label") || "";
 
   const searchQuery = useQuery({
     queryKey: ["search", query, lat, lng, radiusKm],
@@ -43,29 +48,60 @@ export default function ResultsPage() {
     queryFn: () => fetchDiscoverStatus(discoverMutation.data.job_id),
     enabled: Boolean(discoverMutation.data?.job_id),
     refetchInterval: (queryData) =>
-      queryData?.state?.data?.status === "completed" ? false : 1500,
+      ["completed", "failed"].includes(queryData?.state?.data?.status) ? false : 3000,
   });
 
   const businesses = searchQuery.data || [];
+  const visibleBusinesses = useMemo(
+    () => (onlyExclusive ? businesses.filter((business) => !business.already_on_google) : businesses),
+    [businesses, onlyExclusive]
+  );
+
   const businessesWithDistance = useMemo(
     () =>
-      businesses.map((business) => ({
+      visibleBusinesses.map((business) => ({
         business,
         distanceKm: haversineKm(lat, lng, business.lat, business.lng),
       })),
-    [businesses, lat, lng]
+    [visibleBusinesses, lat, lng]
   );
 
   const status = statusQuery.data;
+  const exclusiveCount = businesses.filter((business) => !business.already_on_google).length;
+
+  useEffect(() => {
+    if (window.location.hash === "#results" && resultsSectionRef.current) {
+      resultsSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (status?.status === "completed") {
+      queryClient.invalidateQueries({ queryKey: ["search", query, lat, lng, radiusKm] });
+    }
+  }, [status?.status, queryClient, query, lat, lng, radiusKm]);
+
+  function handleMarkerClick(businessId) {
+    setSelectedBusinessId(businessId);
+    const card = cardRefs.current[businessId];
+    if (card) {
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+
+  function handleCardClick(businessId) {
+    setSelectedBusinessId(businessId);
+  }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5" ref={resultsSectionRef} id="results">
       <section className="rounded-2xl border border-slate-200 bg-white p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-xl font-semibold">Discovery Results</h1>
             <p className="text-sm text-slate-600">
-              Query: <span className="font-medium">{query || "all businesses"}</span> within{" "}
+              Query:{" "}
+              <span className="font-medium">{categoryLabel || query || "all businesses"}</span> within{" "}
               {radiusKm.toFixed(1)} km
             </p>
           </div>
@@ -87,6 +123,19 @@ export default function ResultsPage() {
           </p>
         )}
       </section>
+      {!searchQuery.isLoading && !searchQuery.isError && (
+        <section className="rounded-xl border border-slate-200 bg-white p-4 text-sm">
+          <span className="font-medium">{businesses.length} businesses found</span>
+          <span className="mx-2 text-slate-400">·</span>
+          <button
+            type="button"
+            onClick={() => setOnlyExclusive((prev) => !prev)}
+            className="font-semibold text-amber-600 hover:text-amber-700"
+          >
+            ✨ {exclusiveCount} exclusive to StreetTrade
+          </button>
+        </section>
+      )}
 
       <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1.05fr_1.45fr]">
         <div className="max-h-[560px] space-y-3 overflow-auto pr-1">
@@ -97,15 +146,51 @@ export default function ResultsPage() {
             </p>
           )}
           {businessesWithDistance.map(({ business, distanceKm }) => (
-            <ResultCard key={business.id} business={business} distanceKm={distanceKm} />
+            <div
+              key={business.id}
+              ref={(node) => {
+                if (node) cardRefs.current[business.id] = node;
+              }}
+            >
+              <ResultCard
+                business={business}
+                distanceKm={distanceKm}
+                isSelected={selectedBusinessId === business.id}
+                onSelect={handleCardClick}
+              />
+            </div>
           ))}
           {!searchQuery.isLoading && businessesWithDistance.length === 0 && (
-            <p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600">
-              No matches found in radius. Try a broader radius or trigger discovery.
-            </p>
+            <div className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-600">
+              <p className="text-3xl">🏪</p>
+              <p className="mt-2 text-base font-semibold text-slate-800">
+                No businesses discovered here yet
+              </p>
+              <p className="mt-1">
+                StreetTrade hasn't scanned this area. Trigger a discovery scan below.
+              </p>
+              <button
+                type="button"
+                onClick={() => discoverMutation.mutate()}
+                className="mt-4 rounded-xl bg-streettrade-ink px-4 py-2 text-sm font-semibold text-white"
+              >
+                Scan this area
+              </button>
+              {status && (
+                <p className="mt-2 text-xs text-slate-500">
+                  Scan progress: {status.status} ({status.progress}%)
+                </p>
+              )}
+            </div>
           )}
         </div>
-        <BusinessMap businesses={businesses} center={{ lat, lng }} radiusKm={radiusKm} />
+        <BusinessMap
+          businesses={visibleBusinesses}
+          center={{ lat, lng }}
+          radiusKm={radiusKm}
+          selectedBusinessId={selectedBusinessId}
+          onMarkerClick={handleMarkerClick}
+        />
       </section>
     </div>
   );
