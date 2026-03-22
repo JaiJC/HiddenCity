@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Search, X } from 'lucide-react';
-import { mockBusinesses, categories } from '../data/mockBusinesses';
+import { categories } from '../data/mockBusinesses';
+import type { Business } from '../data/types';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
   onSelectBusiness?: (id: string) => void;
   initialQuery?: string;
+  businesses?: Business[];
 }
 
 interface Suggestion {
@@ -32,7 +34,7 @@ function getCategoryEmoji(category: string): string {
   return map[category.toLowerCase()] || '\u{1F4CD}';
 }
 
-export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '' }: SearchBarProps) {
+export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '', businesses = [] }: SearchBarProps) {
   const [query, setQuery] = useState(initialQuery);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -48,7 +50,7 @@ export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '
 
     const results: Suggestion[] = [];
 
-    const bizMatches = mockBusinesses
+    const bizMatches = businesses
       .filter((b) => b.name.toLowerCase().includes(trimmed))
       .slice(0, 5)
       .map((b): Suggestion => ({
@@ -72,7 +74,7 @@ export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '
       }));
     results.push(...catMatches);
 
-    const allTags = new Set(mockBusinesses.flatMap((b) => b.tags));
+    const allTags = new Set(businesses.flatMap((b) => b.tags));
     const tagMatch = [...allTags].find((t) => t.toLowerCase().includes(trimmed));
     if (tagMatch) {
       results.push({

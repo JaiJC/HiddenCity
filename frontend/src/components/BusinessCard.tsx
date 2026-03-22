@@ -81,7 +81,7 @@ export default function BusinessCard({ business, isSelected, onClick }: Business
             {tag.emoji} {tag.label}
           </span>
         ))}
-        {!business.on_google && (
+        {!business.onGoogle && (
           <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-orange-50 text-[#e88c0a]">
             ✨ Hidden
           </span>
