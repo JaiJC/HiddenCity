@@ -18,7 +18,7 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.append(str(ROOT_DIR))
 
-from pipeline.analyze import analyze_storefront
+from pipeline.analyze import analyze_storefront, analyze_uploaded_storefront
 from pipeline.classify import normalize_category, score_confidence
 from pipeline.enrich import cross_reference_business
 from pipeline.streetview import fetch_street_view_images
@@ -313,7 +313,8 @@ async def analyze_demo(file: UploadFile = File(...)) -> dict[str, Any]:
     if not (file.content_type or "").startswith("image/"):
         raise HTTPException(status_code=400, detail="Only image uploads are supported")
 
-    analysis = analyze_storefront(file.filename or "uploaded image")
+    image_bytes = await file.read()
+    analysis = analyze_uploaded_storefront(image_bytes=image_bytes, filename=file.filename or "uploaded image")
     if not analysis.get("business_name"):
         stem = Path(file.filename or "Uploaded storefront").stem.replace("_", " ").replace("-", " ")
         analysis["business_name"] = stem.title()

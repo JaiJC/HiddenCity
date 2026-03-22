@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import json
 import os
 import re
@@ -40,6 +41,25 @@ def _ocr_with_google_vision(image_url: str, api_key: str) -> str:
         "requests": [
             {
                 "image": {"source": {"imageUri": image_url}},
+                "features": [{"type": "TEXT_DETECTION"}],
+            }
+        ]
+    }
+    response = requests.post(endpoint, json=payload, timeout=30)
+    response.raise_for_status()
+    data = response.json()
+    annotations = data.get("responses", [{}])[0].get("textAnnotations", [])
+    if not annotations:
+        return ""
+    return annotations[0].get("description", "").strip()
+
+
+def _ocr_with_google_vision_content(image_bytes: bytes, api_key: str) -> str:
+    endpoint = f"https://vision.googleapis.com/v1/images:annotate?key={api_key}"
+    payload = {
+        "requests": [
+            {
+                "image": {"content": base64.b64encode(image_bytes).decode("utf-8")},
                 "features": [{"type": "TEXT_DETECTION"}],
             }
         ]
@@ -139,6 +159,25 @@ def analyze_storefront(image_url: str) -> StorefrontAnalysis:
     if not output:
         output = _rules_based_classifier(ocr_text=raw_ocr_text, image_url=image_url)
 
+    return {
+        "is_storefront": bool(output.get("is_storefront", False)),
+        "business_name": output.get("business_name"),
+        "category": output.get("category"),
+        "confidence": max(0.0, min(1.0, float(output.get("confidence", 0.6)))),
+        "raw_ocr_text": raw_ocr_text,
+    }
+
+
+def analyze_uploaded_storefront(image_bytes: bytes, filename: str = "uploaded image") -> StorefrontAnalysis:
+    raw_ocr_text = ""
+    vision_key = os.getenv("GOOGLE_VISION_API_KEY")
+    if vision_key and image_bytes:
+        try:
+            raw_ocr_text = _ocr_with_google_vision_content(image_bytes=image_bytes, api_key=vision_key)
+        except Exception:  # noqa: BLE001
+            raw_ocr_text = ""
+
+    output = _rules_based_classifier(ocr_text=raw_ocr_text, image_url=filename)
     return {
         "is_storefront": bool(output.get("is_storefront", False)),
         "business_name": output.get("business_name"),
