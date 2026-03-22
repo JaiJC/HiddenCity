@@ -6,7 +6,7 @@ import { mockBusinesses } from '../data/mockBusinesses';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBWLsGDg5ZgtS6DQ4ykhdZq0ox42ScnL3w';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyB5r9qL1KKSIGUh7iQG-FLTaRB5ojk-XqM';
 
 const CATEGORY_EMOJI: Record<string, string> = {
   restaurant: '🍽️',
@@ -67,113 +67,61 @@ function HeroSection({
   confidence: number;
 }) {
   const pct = Math.round(confidence * 100);
+  const streetViewUrl = `https://maps.googleapis.com/maps/api/streetview?size=800x400&location=${lat},${lng}&heading=90&pitch=0&fov=100&key=${GOOGLE_MAPS_API_KEY}`;
 
   return (
-    <div className="grid grid-cols-5 gap-3 h-[320px]">
-      {/* Left: Street view with AI detection boxes */}
-      <div className="col-span-3 relative rounded-2xl overflow-hidden border border-gray-200 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100">
-        {/* Simulated street imagery */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-200/60 via-gray-100/40 to-gray-300/80" />
-          {/* Building silhouettes */}
-          <div className="absolute bottom-0 left-[3%] w-[30%] h-[65%] bg-gray-300 rounded-t-sm" />
-          <div className="absolute bottom-0 left-[36%] w-[25%] h-[78%] bg-gray-250 rounded-t-sm" style={{ backgroundColor: '#d1d5db' }} />
-          <div className="absolute bottom-0 left-[64%] w-[20%] h-[55%] bg-gray-300 rounded-t-sm" />
-          <div className="absolute bottom-0 right-[2%] w-[12%] h-[45%] bg-gray-350 rounded-t-sm" style={{ backgroundColor: '#c4c8ce' }} />
-          {/* Awnings */}
-          <div className="absolute top-[18%] left-[37%] w-[23%] h-[5%] bg-red-200/40 rounded-b-sm" />
-          <div className="absolute top-[30%] left-[5%] w-[26%] h-[4%] bg-amber-200/30 rounded-b-sm" />
-          {/* Ground / sidewalk */}
-          <div className="absolute bottom-0 left-0 right-0 h-[10%] bg-gray-400/30" />
-          {/* Window lights */}
-          <div className="absolute top-[30%] left-[40%] w-3 h-4 bg-amber-300/20 rounded-sm" />
-          <div className="absolute top-[32%] left-[46%] w-3 h-4 bg-amber-300/15 rounded-sm" />
-          <div className="absolute top-[25%] left-[8%] w-3 h-4 bg-blue-200/15 rounded-sm" />
-        </div>
+    <div className="relative rounded-2xl overflow-hidden border border-gray-200 h-[360px]">
+      {/* Street View image */}
+      <img
+        src={streetViewUrl}
+        alt="Street View"
+        className="absolute inset-0 w-full h-full object-cover"
+        onError={(e) => {
+          (e.target as HTMLImageElement).style.display = 'none';
+        }}
+      />
+      {/* Fallback gradient if image fails */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200" style={{ zIndex: -1 }} />
 
-        {/* AI detection bounding boxes */}
-        <div className="absolute top-[12%] left-[30%] w-[38%] h-[52%] border-2 border-green-500/70 rounded">
-          <span className="absolute -top-5 left-1 text-[10px] font-mono text-green-700 bg-green-100/80 px-1.5 py-0.5 rounded-sm">
-            storefront_sign 0.88
-          </span>
-        </div>
-        <div className="absolute top-[42%] left-[6%] w-[22%] h-[30%] border-2 border-green-500/50 rounded">
-          <span className="absolute -top-5 left-1 text-[10px] font-mono text-green-700/80 bg-green-100/60 px-1.5 py-0.5 rounded-sm">
-            awning 0.74
-          </span>
-        </div>
+      {/* Subtle overlay for readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
 
-        {/* Corner brackets */}
-        {[
-          'top-3 left-3 border-t-2 border-l-2',
-          'top-3 right-3 border-t-2 border-r-2',
-          'bottom-3 left-3 border-b-2 border-l-2',
-          'bottom-3 right-3 border-b-2 border-r-2',
-        ].map((pos) => (
-          <div
-            key={pos}
-            className={`absolute ${pos} w-4 h-4 border-primary/40`}
-          />
-        ))}
-
-        {/* Coordinates label */}
-        <div className="absolute top-4 left-10 text-[11px] font-mono text-gray-400">
-          {lat.toFixed(4)}N, {Math.abs(lng).toFixed(4)}W
-        </div>
-
-        {/* AI Detection badge */}
-        <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-white/85 backdrop-blur-sm border border-primary/30 rounded-lg px-3 py-1.5">
-          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-xs font-medium text-primary">
-            AI Detection
-          </span>
-          <span className="text-[10px] text-gray-500 font-mono">
-            &gt; {pct}% Confidence
-          </span>
-        </div>
+      {/* AI detection bounding box overlay */}
+      <div className="absolute top-[15%] left-[25%] w-[50%] h-[55%] border-2 border-green-400/80 rounded">
+        <span className="absolute -top-6 left-1 text-[11px] font-mono text-white bg-green-500/80 px-2 py-0.5 rounded-sm shadow-sm">
+          storefront_sign {(confidence * 0.95).toFixed(2)}
+        </span>
       </div>
 
-      {/* Right: Social media evidence */}
-      <div className="col-span-2 relative rounded-2xl overflow-hidden border border-gray-200 bg-gradient-to-br from-purple-50 via-pink-50/30 to-gray-50">
-        {/* Abstract social media visual */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-pink-100/30 via-purple-100/20 to-transparent" />
-          {/* Simulated post cards */}
-          <div className="absolute top-[12%] left-[10%] right-[10%] h-[30%] bg-white/70 rounded-lg border border-purple-200/40 shadow-sm">
-            <div className="p-3 space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-pink-200/50" />
-                <div className="h-2 w-16 bg-gray-200 rounded" />
-              </div>
-              <div className="h-2 w-full bg-gray-100 rounded" />
-              <div className="h-2 w-3/4 bg-gray-100 rounded" />
-            </div>
-          </div>
-          <div className="absolute top-[48%] left-[10%] right-[10%] h-[30%] bg-white/50 rounded-lg border border-purple-200/30 shadow-sm">
-            <div className="p-3 space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-blue-200/50" />
-                <div className="h-2 w-20 bg-gray-200 rounded" />
-              </div>
-              <div className="h-2 w-full bg-gray-100 rounded" />
-              <div className="h-2 w-1/2 bg-gray-100 rounded" />
-            </div>
-          </div>
-          {/* Floating hearts / interactions */}
-          <div className="absolute top-[20%] right-[8%] text-pink-300 text-lg">
-            &hearts;
-          </div>
-          <div className="absolute top-[55%] right-[15%] text-pink-200 text-sm">
-            &hearts;
-          </div>
-        </div>
+      {/* Corner scan brackets */}
+      {[
+        'top-3 left-3 border-t-2 border-l-2',
+        'top-3 right-3 border-t-2 border-r-2',
+        'bottom-3 left-3 border-b-2 border-l-2',
+        'bottom-3 right-3 border-b-2 border-r-2',
+      ].map((pos) => (
+        <div key={pos} className={`absolute ${pos} w-5 h-5 border-white/40`} />
+      ))}
 
-        {/* Label */}
-        <div className="absolute bottom-4 left-4 right-4">
-          <span className="text-xs font-medium text-purple-500/70">
-            Social Media Evidence
-          </span>
-        </div>
+      {/* Coordinates */}
+      <div className="absolute top-4 left-12 text-[11px] font-mono text-white/70">
+        {lat.toFixed(4)}N, {Math.abs(lng).toFixed(4)}W
+      </div>
+
+      {/* AI Detection badge */}
+      <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-white/90 backdrop-blur-sm border border-primary/30 rounded-lg px-3 py-1.5 shadow-sm">
+        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+        <span className="text-xs font-semibold text-gray-800">
+          AI Detection
+        </span>
+        <span className="text-[10px] text-primary font-mono font-semibold">
+          {pct}% Confidence
+        </span>
+      </div>
+
+      {/* Source badge */}
+      <div className="absolute bottom-4 right-4 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm">
+        <span className="text-xs text-gray-500">Google Street View</span>
       </div>
     </div>
   );
@@ -230,25 +178,25 @@ function StreetViewEvidence({
   lat: number;
   lng: number;
 }) {
+  const streetViewUrl = `https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${lat},${lng}&heading=90&pitch=0&fov=100&key=${GOOGLE_MAPS_API_KEY}`;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Left: mini detection image */}
-      <div className="relative rounded-xl overflow-hidden border border-gray-200 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 aspect-video">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-200/50 via-gray-100/30 to-gray-300/70" />
-          <div className="absolute bottom-0 left-[5%] w-[28%] h-[60%] bg-gray-300 rounded-t-sm" />
-          <div className="absolute bottom-0 left-[36%] w-[22%] h-[72%] bg-gray-250 rounded-t-sm" style={{ backgroundColor: '#d1d5db' }} />
-          <div className="absolute bottom-0 left-[62%] w-[18%] h-[50%] bg-gray-300 rounded-t-sm" />
-          <div className="absolute bottom-0 right-[4%] w-[14%] h-[42%] bg-gray-350 rounded-t-sm" style={{ backgroundColor: '#c4c8ce' }} />
-          <div className="absolute bottom-0 left-0 right-0 h-[8%] bg-gray-400/30" />
-        </div>
-        {/* Bounding box */}
-        <div className="absolute top-[14%] left-[28%] w-[42%] h-[48%] border-2 border-green-500/70 rounded">
-          <span className="absolute -top-5 left-1 text-[9px] font-mono text-green-700 bg-green-100/80 px-1.5 py-0.5 rounded-sm">
-            storefront_sign 0.88
+      {/* Left: Street View with detection overlay */}
+      <div className="relative rounded-xl overflow-hidden border border-gray-200 aspect-video bg-gray-100">
+        <img
+          src={streetViewUrl}
+          alt="Street View Evidence"
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+        />
+        {/* Detection bounding box */}
+        <div className="absolute top-[14%] left-[25%] w-[50%] h-[55%] border-2 border-green-400/80 rounded">
+          <span className="absolute -top-5 left-1 text-[9px] font-mono text-white bg-green-500/80 px-1.5 py-0.5 rounded-sm">
+            storefront_sign {(confidence * 0.95).toFixed(2)}
           </span>
         </div>
-        <div className="absolute top-4 left-4 text-[10px] font-mono text-gray-400">
+        <div className="absolute top-3 left-3 text-[10px] font-mono text-white/70 bg-black/30 px-1.5 py-0.5 rounded">
           {lat.toFixed(4)}N, {Math.abs(lng).toFixed(4)}W
         </div>
       </div>

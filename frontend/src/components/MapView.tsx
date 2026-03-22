@@ -17,7 +17,7 @@ interface MapViewProps {
 
 const VANCOUVER_CENTER: [number, number] = [49.27, -123.0724];
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBWLsGDg5ZgtS6DQ4ykhdZq0ox42ScnL3w';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyB5r9qL1KKSIGUh7iQG-FLTaRB5ojk-XqM';
 
 const containerStyle = {
   width: '100%',
