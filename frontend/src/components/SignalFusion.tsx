@@ -2,7 +2,7 @@ import { Camera, Building2, Instagram, ArrowDown, ArrowRight, CheckCircle } from
 
 const SOURCES = [
   { icon: Camera, label: 'Street View', sub: 'Image file', color: 'text-blue-400' },
-  { icon: Building2, label: 'City Registry', sub: 'Business data', color: 'text-emerald-400' },
+  { icon: Building2, label: 'City Registry', sub: 'Business data', color: 'text-primary-light' },
   { icon: Instagram, label: 'Instagram', sub: 'Social posts', color: 'text-pink-400' },
 ];
 
@@ -29,7 +29,7 @@ export default function SignalFusion() {
         </span>
       </div>
       <p className="text-sm text-gray-400 mb-8">
-        How StreetTrade combines multiple data sources to verify businesses
+        How Hidden City combines multiple data sources to verify businesses
       </p>
 
       <div className="flex flex-col lg:flex-row items-center gap-6">
@@ -105,9 +105,9 @@ export default function SignalFusion() {
           <p className="text-base font-semibold text-white mb-3">Rose &amp; Thorn Vintage</p>
 
           {/* Verified badge */}
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1">
-            <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-xs font-semibold text-emerald-400">Verified Business</span>
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 border border-primary/30 px-3 py-1">
+            <CheckCircle className="w-3.5 h-3.5 text-primary-light" />
+            <span className="text-xs font-semibold text-primary-light">Verified Business</span>
           </div>
         </div>
       </div>

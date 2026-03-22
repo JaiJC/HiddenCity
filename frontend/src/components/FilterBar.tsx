@@ -3,9 +3,9 @@ import { categories } from '../data/mockBusinesses';
 
 export type SortOption = 'relevance' | 'confidence' | 'name';
 export type SourceFilter = 'all' | 'street_view' | 'social_media' | 'both';
-export type ConfidenceFilter = 'all' | '80' | '90';
+export type DistanceFilter = '500m' | '1km' | '2km' | '5km';
 
-type DistanceFilter = '500m' | '1km' | '2km' | '5km';
+const distanceOptions: DistanceFilter[] = ['500m', '1km', '2km', '5km'];
 
 interface FilterBarProps {
   category: Category;
@@ -14,13 +14,9 @@ interface FilterBarProps {
   onSortChange: (sort: SortOption) => void;
   sourceFilter: SourceFilter;
   onSourceChange: (source: SourceFilter) => void;
-  confidenceFilter: ConfidenceFilter;
-  onConfidenceChange: (conf: ConfidenceFilter) => void;
-  exclusiveOnly: boolean;
-  onExclusiveToggle: () => void;
+  distance: DistanceFilter;
+  onDistanceChange: (dist: DistanceFilter) => void;
   resultCount: number;
-  exclusiveCount: number;
-  googleCount: number;
   query?: string;
 }
 
@@ -30,8 +26,6 @@ const sourcePills: { value: SourceFilter; label: string }[] = [
   { value: 'social_media', label: 'Registry Only' },
 ];
 
-const distanceOptions: DistanceFilter[] = ['500m', '1km', '2km', '5km'];
-
 export default function FilterBar({
   category,
   onCategoryChange,
@@ -39,6 +33,8 @@ export default function FilterBar({
   onSortChange,
   sourceFilter,
   onSourceChange,
+  distance,
+  onDistanceChange,
   resultCount,
   query,
 }: FilterBarProps) {
@@ -65,7 +61,12 @@ export default function FilterBar({
         {distanceOptions.map((dist) => (
           <button
             key={dist}
-            className="px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-[#1a2332] text-gray-400 hover:text-gray-300 transition-all"
+            onClick={() => onDistanceChange(dist)}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+              distance === dist
+                ? 'bg-[#e88c0a] text-white'
+                : 'bg-[#1a2332] text-gray-400 hover:text-gray-300'
+            }`}
           >
             {dist}
           </button>

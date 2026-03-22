@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Sparkles, ChevronDown } from 'lucide-react';
+import { Search, Sparkles, ChevronDown, Camera, ScanSearch, Tags, Share2, Info } from 'lucide-react';
+import SignalFusion from '../components/SignalFusion';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -112,6 +113,104 @@ export default function LandingPage() {
             />
           </div>
         </form>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="relative z-10 px-4 py-24">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="mb-4 text-center text-3xl font-bold text-white sm:text-4xl">
+            How It <span className="text-primary-light">Works</span>
+          </h2>
+          <p className="mx-auto mb-16 max-w-2xl text-center text-gray-400">
+            Our AI pipeline turns street-level imagery into actionable business intelligence in four steps.
+          </p>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                icon: Camera,
+                step: '01',
+                title: 'Capture',
+                description: 'Street View imagery captured and processed at scale across target neighborhoods.',
+              },
+              {
+                icon: ScanSearch,
+                step: '02',
+                title: 'Analyze',
+                description: 'VLM analyzes storefronts, signage, window displays, and awnings for business signals.',
+              },
+              {
+                icon: Tags,
+                step: '03',
+                title: 'Classify',
+                description: 'Business name extraction, category inference, and metadata generation from visual cues.',
+              },
+              {
+                icon: Share2,
+                step: '04',
+                title: 'Verify',
+                description: 'Cross-reference with social media, directories, and public records for validation.',
+              },
+            ].map(({ icon: Icon, step, title, description }) => (
+              <div
+                key={step}
+                className="group relative rounded-2xl border border-[#1e2a3a] bg-[#0f1724] p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+              >
+                <span className="mb-4 block font-mono text-xs font-bold text-primary/40">{step}</span>
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <Icon size={20} className="text-primary" />
+                </div>
+                <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Sources Section */}
+      <section id="sources" className="relative z-10 bg-[#050810] px-4 py-24">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="mb-4 text-center text-3xl font-bold text-white sm:text-4xl">
+            Data <span className="text-primary-light">Sources</span>
+          </h2>
+          <p className="mx-auto mb-12 max-w-2xl text-center text-gray-400">
+            Multiple signals fused together for high-confidence business discovery.
+          </p>
+          <SignalFusion />
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="relative z-10 px-4 py-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+            <Info size={24} className="text-primary" />
+          </div>
+          <h2 className="mb-6 text-3xl font-bold text-white sm:text-4xl">
+            About <span className="text-primary-light">Hidden City</span>
+          </h2>
+          <p className="text-lg leading-relaxed text-gray-400">
+            Hidden City uses AI to discover businesses that are invisible to traditional
+            search — no Google listing, no website, no digital footprint. We find them
+            through street-level imagery and social signals.
+          </p>
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {[
+              { value: '10K+', label: 'Businesses Discovered' },
+              { value: '94%', label: 'Verification Accuracy' },
+              { value: '50+', label: 'Neighborhoods Mapped' },
+            ].map(({ value, label }) => (
+              <div
+                key={label}
+                className="rounded-xl border border-[#1e2a3a] bg-[#0f1724] px-6 py-5"
+              >
+                <p className="text-2xl font-extrabold text-primary">{value}</p>
+                <p className="mt-1 text-sm text-gray-400">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* City Skyline Silhouette */}

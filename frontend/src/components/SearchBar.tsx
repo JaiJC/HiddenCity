@@ -5,6 +5,7 @@ import { mockBusinesses, categories } from '../data/mockBusinesses';
 interface SearchBarProps {
   onSearch: (query: string) => void;
   onSelectBusiness?: (id: string) => void;
+  initialQuery?: string;
 }
 
 interface Suggestion {
@@ -16,8 +17,8 @@ interface Suggestion {
   exclusive?: boolean;
 }
 
-export default function SearchBar({ onSearch, onSelectBusiness }: SearchBarProps) {
-  const [query, setQuery] = useState('');
+export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '' }: SearchBarProps) {
+  const [query, setQuery] = useState(initialQuery);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);

@@ -1,9 +1,9 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import FilterBar from '../components/FilterBar';
-import type { SortOption, SourceFilter, ConfidenceFilter } from '../components/FilterBar';
+import type { SortOption, SourceFilter, DistanceFilter } from '../components/FilterBar';
 import BusinessCard from '../components/BusinessCard';
 import MapView from '../components/MapView';
 import { mockBusinesses } from '../data/mockBusinesses';
@@ -13,15 +13,29 @@ const VANCOUVER_CENTER: [number, number] = [49.27, -123.0724];
 
 export default function SearchPage() {
   const navigate = useNavigate();
-  const [query, setQuery] = useState('');
+  const [searchParams] = useSearchParams();
+  const initialQuery = searchParams.get('q') || '';
+  const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState<Category>('all');
   const [sortBy, setSortBy] = useState<SortOption>('confidence');
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>('all');
-  const [confidenceFilter, setConfidenceFilter] = useState<ConfidenceFilter>('all');
-  const [exclusiveOnly, setExclusiveOnly] = useState(false);
+  const [distance, setDistance] = useState<DistanceFilter>('5km');
   const [selectedId, setSelectedId] = useState<string | undefined>();
   const [mapCenter, setMapCenter] = useState<[number, number]>(VANCOUVER_CENTER);
   const listRef = useRef<HTMLDivElement>(null);
+
+  // Convert distance filter string to km number
+  const distanceKm = useMemo(() => {
+    const map: Record<DistanceFilter, number> = { '500m': 0.5, '1km': 1, '2km': 2, '5km': 5 };
+    return map[distance];
+  }, [distance]);
+
+  // Rough distance calc (good enough for city-scale filtering)
+  const getDistanceKm = useCallback((lat: number, lng: number) => {
+    const dLat = (lat - VANCOUVER_CENTER[0]) * 111;
+    const dLng = (lng - VANCOUVER_CENTER[1]) * 111 * Math.cos(VANCOUVER_CENTER[0] * Math.PI / 180);
+    return Math.sqrt(dLat * dLat + dLng * dLng);
+  }, []);
 
   // Filter and sort businesses
   const filtered = useMemo(() => {
@@ -40,10 +54,7 @@ export default function SearchPage() {
 
       if (sourceFilter !== 'all' && biz.source !== sourceFilter) return false;
 
-      if (confidenceFilter === '80' && biz.confidence < 0.8) return false;
-      if (confidenceFilter === '90' && biz.confidence < 0.9) return false;
-
-      if (exclusiveOnly && biz.onGoogle) return false;
+      if (getDistanceKm(biz.lat, biz.lng) > distanceKm) return false;
 
       return true;
     });
@@ -55,10 +66,8 @@ export default function SearchPage() {
     }
 
     return results;
-  }, [query, category, sortBy, sourceFilter, confidenceFilter, exclusiveOnly]);
+  }, [query, category, sortBy, sourceFilter, distanceKm, getDistanceKm]);
 
-  const googleCount = filtered.filter((b) => b.onGoogle).length;
-  const exclusiveCount = filtered.filter((b) => !b.onGoogle).length;
   const totalCount = filtered.length;
 
   const handleSearch = useCallback((q: string) => {
@@ -91,7 +100,7 @@ export default function SearchPage() {
     <div className="min-h-screen bg-[#0a0e17] text-white flex flex-col">
       {/* Search bar */}
       <header className="bg-[#0a0e17] border-b border-[#1e2a3a] px-4 py-4">
-        <SearchBar onSearch={handleSearch} onSelectBusiness={handleSelectBusiness} />
+        <SearchBar onSearch={handleSearch} onSelectBusiness={handleSelectBusiness} initialQuery={initialQuery} />
       </header>
 
       {/* Filter bar */}
@@ -102,13 +111,9 @@ export default function SearchPage() {
         onSortChange={setSortBy}
         sourceFilter={sourceFilter}
         onSourceChange={setSourceFilter}
-        confidenceFilter={confidenceFilter}
-        onConfidenceChange={setConfidenceFilter}
-        exclusiveOnly={exclusiveOnly}
-        onExclusiveToggle={() => setExclusiveOnly((v) => !v)}
+        distance={distance}
+        onDistanceChange={setDistance}
         resultCount={totalCount}
-        exclusiveCount={exclusiveCount}
-        googleCount={googleCount}
         query={query || undefined}
       />
 

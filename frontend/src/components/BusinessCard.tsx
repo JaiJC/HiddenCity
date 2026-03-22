@@ -10,7 +10,7 @@ interface BusinessCardProps {
 
 const sourceTagStyles: Record<string, { bg: string; text: string; label: string }> = {
   street_view: { bg: 'bg-teal-500/20', text: 'text-teal-400', label: 'Street View' },
-  social_media: { bg: 'bg-pink-500/20', text: 'text-pink-400', label: 'Inst' },
+  social_media: { bg: 'bg-pink-500/20', text: 'text-pink-400', label: 'Social' },
   both: { bg: 'bg-blue-500/20', text: 'text-blue-400', label: 'Registry' },
 };
 

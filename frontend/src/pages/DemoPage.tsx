@@ -12,7 +12,9 @@ import {
   Instagram,
   Facebook,
   ExternalLink,
+  Sparkles,
 } from 'lucide-react';
+import IntentSearch from '../components/IntentSearch';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -686,6 +688,29 @@ export default function DemoPage() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Intent Search Showcase */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
+        <div className="border-t border-surface-lighter pt-16">
+          <div className="flex items-center gap-3 mb-2">
+            <Sparkles size={18} className="text-primary" />
+            <p className="text-primary font-mono text-sm tracking-wider uppercase">
+              Natural Language Search
+            </p>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+            AI-Powered Intent Search
+          </h2>
+          <p className="text-gray-400 max-w-2xl text-base mb-10">
+            Describe what you are looking for in natural language. Our AI understands
+            intent, style preferences, and location context to surface the most
+            relevant hidden businesses.
+          </p>
+          <div className="flex justify-center">
+            <IntentSearch />
           </div>
         </div>
       </div>
