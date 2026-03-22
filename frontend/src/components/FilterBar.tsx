@@ -39,24 +39,25 @@ export default function FilterBar({
   query,
 }: FilterBarProps) {
   return (
-    <div className="bg-[#0a0e17] border-b border-[#1e2a3a] py-3 px-4 space-y-3">
+    <div className="bg-white border-b border-gray-100 py-3 px-4 space-y-3">
       {/* Row 1: Category + Distance Pills */}
       <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
         {categories.map((cat) => (
           <button
             key={cat.value}
             onClick={() => onCategoryChange(cat.value)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               category === cat.value
-                ? 'bg-[#e88c0a] text-white'
-                : 'bg-[#1a2332] text-gray-400 hover:text-gray-300'
+                ? 'bg-gray-900 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            {cat.label}
+            <span className="text-sm leading-none">{cat.icon}</span>
+            <span>{cat.label}</span>
           </button>
         ))}
 
-        <div className="w-px h-5 bg-[#1e2a3a] mx-1 shrink-0" />
+        <div className="w-px h-5 bg-gray-200 mx-1 shrink-0" />
 
         {distanceOptions.map((dist) => (
           <button
@@ -64,21 +65,13 @@ export default function FilterBar({
             onClick={() => onDistanceChange(dist)}
             className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               distance === dist
-                ? 'bg-[#e88c0a] text-white'
-                : 'bg-[#1a2332] text-gray-400 hover:text-gray-300'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
             }`}
           >
             {dist}
           </button>
         ))}
-
-        <div className="w-px h-5 bg-[#1e2a3a] mx-1 shrink-0" />
-
-        <button
-          className="px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-[#1a2332] text-gray-400 hover:text-gray-300 transition-all"
-        >
-          Business
-        </button>
       </div>
 
       {/* Row 2: Source pills + sort text + result count */}
@@ -90,8 +83,8 @@ export default function FilterBar({
               onClick={() => onSourceChange(pill.value)}
               className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all ${
                 sourceFilter === pill.value
-                  ? 'bg-[#e88c0a] text-white'
-                  : 'bg-[#1a2332] text-gray-400 hover:text-gray-300'
+                  ? 'bg-gray-900 text-white'
+                  : 'border border-gray-200 text-gray-500 hover:bg-gray-50'
               }`}
             >
               {pill.label}
@@ -101,15 +94,15 @@ export default function FilterBar({
 
         <div className="flex items-center gap-4">
           {query && (
-            <span className="text-sm text-gray-400">
-              <span className="text-white font-medium">{resultCount}</span>
+            <span className="text-sm text-gray-500">
+              <span className="text-gray-700 font-medium">{resultCount}</span>
               {' results for '}
-              <span className="text-[#e88c0a]">'{query}'</span>
+              <span className="text-[#e88c0a] font-medium">'{query}'</span>
             </span>
           )}
           <button
             onClick={() => onSortChange(sortBy === 'confidence' ? 'relevance' : 'confidence')}
-            className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
           >
             Sorted by {sortBy}
           </button>

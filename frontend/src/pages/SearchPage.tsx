@@ -97,9 +97,9 @@ export default function SearchPage() {
   }, [selectedId]);
 
   return (
-    <div className="min-h-screen bg-[#0a0e17] text-white flex flex-col">
+    <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
       {/* Search bar */}
-      <header className="bg-[#0a0e17] border-b border-[#1e2a3a] px-4 py-4">
+      <header className="bg-white border-b border-gray-100 px-4 py-4">
         <SearchBar onSearch={handleSearch} onSelectBusiness={handleSelectBusiness} initialQuery={initialQuery} />
       </header>
 
@@ -122,12 +122,12 @@ export default function SearchPage() {
         {/* Business list — 45% */}
         <div
           ref={listRef}
-          className="w-[45%] shrink-0 overflow-y-auto border-r border-[#1e2a3a] p-4 space-y-3"
+          className="w-[45%] shrink-0 overflow-y-auto bg-white border-r border-gray-100 p-4 space-y-3"
         >
           {query && (
             <div className="pb-2">
               <h2 className="text-sm text-gray-400">
-                <span className="text-white font-semibold">{totalCount} results</span>
+                <span className="text-gray-900 font-semibold">{totalCount} results</span>
                 {' for '}
                 <span className="text-[#e88c0a] font-medium">'{query}'</span>
               </h2>
@@ -135,7 +135,7 @@ export default function SearchPage() {
           )}
 
           {filtered.length === 0 ? (
-            <div className="text-center py-16 text-gray-500">
+            <div className="text-center py-16 text-gray-400">
               <MapPin className="w-10 h-10 mx-auto mb-3 opacity-40" />
               <p className="text-sm font-medium">No businesses found</p>
               <p className="text-xs mt-1">Try adjusting your search or filters</p>

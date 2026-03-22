@@ -15,6 +15,21 @@ interface Suggestion {
   sublabel?: string;
   icon?: string;
   exclusive?: boolean;
+  category?: string;
+}
+
+function getCategoryEmoji(category: string): string {
+  const map: Record<string, string> = {
+    restaurant: '\u{1F37D}\uFE0F',
+    cafe: '\u2615',
+    bakery: '\u{1F950}',
+    retail: '\u{1F6CD}\uFE0F',
+    grocery: '\u{1F96C}',
+    salon: '\u{1F487}',
+    repair: '\u{1F527}',
+    art: '\u{1F3A8}',
+  };
+  return map[category.toLowerCase()] || '\u{1F4CD}';
 }
 
 export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '' }: SearchBarProps) {
@@ -41,6 +56,7 @@ export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '
         id: b.id,
         label: b.name,
         sublabel: b.category,
+        category: b.category,
         exclusive: !b.onGoogle,
       }));
     results.push(...bizMatches);
@@ -168,7 +184,7 @@ export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '
   return (
     <div ref={containerRef} className="relative w-full">
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
         <input
           ref={inputRef}
           type="text"
@@ -178,7 +194,7 @@ export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           placeholder="Search hidden businesses near you..."
-          className="w-full pl-12 pr-12 py-3.5 bg-[#0f1724] border border-[#1e2a3a] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#e88c0a] focus:ring-2 focus:ring-[#e88c0a]/20 transition-all text-sm"
+          className="w-full pl-12 pr-12 py-3.5 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 shadow-lg shadow-gray-100 transition-all text-sm"
           role="combobox"
           aria-expanded={showDropdown}
           aria-autocomplete="list"
@@ -189,7 +205,7 @@ export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '
         {query && (
           <button
             onClick={handleClear}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors"
             aria-label="Clear search"
           >
             <X className="w-4 h-4" />
@@ -199,7 +215,7 @@ export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '
 
       {showDropdown && suggestions.length > 0 && (
         <ul
-          className="absolute z-50 w-full mt-1.5 bg-[#0f1724] border border-[#1e2a3a] rounded-xl shadow-2xl shadow-black/40 overflow-hidden py-1"
+          className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden py-2"
           role="listbox"
         >
           {suggestions.map((suggestion, index) => (
@@ -208,10 +224,10 @@ export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '
               id={`suggestion-${index}`}
               role="option"
               aria-selected={highlightedIndex === index}
-              className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors text-sm ${
+              className={`flex items-center gap-3 px-5 py-3 cursor-pointer transition-colors text-sm ${
                 highlightedIndex === index
-                  ? 'bg-[#1a2332]'
-                  : 'hover:bg-[#1a2332]'
+                  ? 'bg-gray-50'
+                  : 'hover:bg-gray-50'
               }`}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -221,13 +237,14 @@ export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '
             >
               {suggestion.type === 'business' && (
                 <>
-                  <span
-                    className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                      suggestion.exclusive ? 'bg-[#e88c0a]' : 'bg-gray-500'
-                    }`}
-                  />
-                  <span className="text-white truncate">{suggestion.label}</span>
-                  <span className="ml-auto text-xs text-gray-500 capitalize flex-shrink-0">
+                  <span className="text-base leading-none flex-shrink-0">
+                    {getCategoryEmoji(suggestion.category || '')}
+                  </span>
+                  <span className="text-gray-900 font-medium truncate">{suggestion.label}</span>
+                  {suggestion.exclusive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#e88c0a] flex-shrink-0" />
+                  )}
+                  <span className="ml-auto text-xs text-gray-400 capitalize flex-shrink-0">
                     {suggestion.sublabel}
                   </span>
                 </>
@@ -237,13 +254,13 @@ export default function SearchBar({ onSearch, onSelectBusiness, initialQuery = '
                   <span className="text-base leading-none flex-shrink-0">
                     {suggestion.icon}
                   </span>
-                  <span className="text-gray-300">{suggestion.label}</span>
+                  <span className="text-gray-600">{suggestion.label}</span>
                 </>
               )}
               {suggestion.type === 'tag' && (
                 <>
-                  <Search className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
-                  <span className="text-gray-300">{suggestion.label}</span>
+                  <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                  <span className="text-gray-600">{suggestion.label}</span>
                 </>
               )}
             </li>

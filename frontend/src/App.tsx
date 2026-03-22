@@ -8,7 +8,7 @@ import BusinessDetailPage from './pages/BusinessDetailPage'
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-950">
+      <div className="min-h-screen bg-white">
         <Navbar />
         <main className="pt-14">
           <Routes>
